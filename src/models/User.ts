@@ -4,6 +4,7 @@ import sequelize from "../config/database";
 class User extends Model {
   public id!: number;
   public name!: string;
+  public lastName: string | undefined;
   public email: string | undefined;
 }
 
@@ -19,6 +20,9 @@ User.init(
       allowNull: false,
     },
     email: {
+      type: DataTypes.STRING
+    },
+    lastName: {
       type: DataTypes.STRING
     },
   },

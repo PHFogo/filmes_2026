@@ -16,7 +16,7 @@ class UsersController {
   }
 
   static async create(req: Request, res: Response) {
-    const { name, email } = req.body;
+    const { name, email, lastName } = req.body;
 
     if (email && email != '') {
         const savedUser = await User.findOne({ where: {email: email} });
@@ -25,6 +25,10 @@ class UsersController {
         }
     } else {
         return res.status(400).json({ message: 'Email é obrigatório!' });
+    }
+
+    if (!lastName || lastName == '') {
+        return res.status(400).json({ message: 'Sobrenome é obrigatório!' });
     }
 
     const user = await User.create({ name: name, email: email });
