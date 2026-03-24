@@ -1,19 +1,16 @@
 import { Request, Response } from "express";
-import Movie from "../models/Movie";
 import Genre from "../models/Genre";
 
-class MoviesController {
+class GenresController {
   static async findAll(req: Request, res: Response) {
-    const movies = await Movie.findAll({
-      include: [{ model: Genre, as: "genre"}]
-    });
+    const genres = await Genre.findAll();
 
-    res.send(movies);
+    res.send(genres);
   }
 
   static async getById(req: Request, res: Response) {
     const { id } = req.params;
-    const movie = await Movie.findByPk(Number(id));
+    const movie = await Genre.findByPk(Number(id));
 
     return res.status(200).send(movie);
   }
@@ -22,20 +19,20 @@ class MoviesController {
     const { name } = req.body;
 
     if (!name || name == '') {
-        return res.status(400).json({ message: 'Nome do filme é obrigatório!' });
+        return res.status(400).json({ message: 'Nome do Gênero é obrigatório!' });
     }
 
-    const movie = await Movie.create({ name });
+    const movie = await Genre.create({ name });
     return res.status(200).send(movie);
   }
 
   static async remove(req: Request, res: Response) {
     const { id } = req.params;
-    const movie = await Movie.findByPk(Number(id));
+    const movie = await Genre.findByPk(Number(id));
     if (movie) {
       movie?.destroy();
     } else {
-      res.status(404).json({ messsage: "Filme não encontrado" });
+      res.status(404).json({ messsage: "Gênero não encontrado" });
     }
 
     res.status(204).send();
@@ -45,7 +42,7 @@ class MoviesController {
     const { id } = req.params;
     const { name } = req.body;
 
-    const movie = await Movie.findByPk(Number(id));
+    const movie = await Genre.findByPk(Number(id));
     if (movie) {
       await movie.update({
         name
@@ -53,9 +50,9 @@ class MoviesController {
 
       res.status(200).send(movie);
     } else {
-      res.status(404).json({ messsage: "Filme não encontrado" });
+      res.status(404).json({ messsage: "Gênero não encontrado" });
     }
   }
 }
 
-export default MoviesController;
+export default GenresController;
