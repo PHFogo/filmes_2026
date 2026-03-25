@@ -11,8 +11,12 @@ class UsersController {
   static async getById(req: Request, res: Response) {
     const { id } = req.params;
     const user = await User.findByPk(Number(id));
+    if (user) {
+      return res.status(200).send(user);
+    } else {
+      return res.status(404).json({ message: 'Usuário não encontrado!' });
+    }
 
-    return res.status(200).send(user);
   }
 
   static async create(req: Request, res: Response) {
