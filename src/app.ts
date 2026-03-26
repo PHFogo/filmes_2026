@@ -3,6 +3,8 @@ import UsersController from './controllers/users.controller';
 import MoviesController from './controllers/movies.controller';
 import ActorsController from './controllers/actors.controller';
 import GenresController from './controllers/genres.controller';
+import AuthController from './controllers/auth.controller';
+import "dotenv/config";
 
 const app = express();
 app.use(express.json());
@@ -40,6 +42,9 @@ router.post('/actors', ActorsController.create);
 router.get('/actors/:id', ActorsController.getById);
 router.delete('/actors/:id', ActorsController.remove);
 router.put('/actors/:id', ActorsController.update);
+
+// rota de autenticação
+router.post('/login', AuthController.login);
 
 app.use(router);
 
