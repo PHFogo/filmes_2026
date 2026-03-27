@@ -4,76 +4,72 @@ import bcrypt from "bcrypt";
 
 class UsersController {
   static async findAll(req: Request, res: Response) {
-    const users = await User.findAll();
-
+    const users = await User.findAll({ attributes: { exclude: ['password'] } });
     res.send(users);
   }
 
   static async getById(req: Request, res: Response) {
     const { id } = req.params;
-    const user = await User.findByPk(Number(id));
+    const user = await User.findByPk(Number(id), { attributes: { exclude: ['password'] } });
     if (user) {
       return res.status(200).send(user);
     } else {
       return res.status(404).json({ message: 'Usuário não encontrado!' });
     }
-
   }
 
   static async create(req: Request, res: Response) {
-    const { name, email, lastName, password } = req.body;
+    const { name, email, password, tipo } = req.body;
 
-    if (email && email != '') {
-        const savedUser = await User.findOne({ where: {email: email} });
-        if (savedUser) {
-            return res.status(400).json({ message: 'Usuário já existe com esse email!' });
-        }
-    } else {
-        return res.status(400).json({ message: 'Email é obrigatório!' });
+    if (!email || email === '') {
+      return res.status(400).json({ message: 'Email é obrigatório!' });
     }
 
-    if (!password || password == '') {
-        return res.status(400).json({ message: 'Senha é obrigatória!' });
-    } 
-    // validação da força da senha
+    const savedUser = await User.findOne({ where: { email } });
+    if (savedUser) {
+      return res.status(400).json({ message: 'Usuário já existe com esse email!' });
+    }
+
+    if (!password || password === '') {
+      return res.status(400).json({ message: 'Senha é obrigatória!' });
+    }
+
+    if (!name || name === '') {
+      return res.status(400).json({ message: 'Nome é obrigatório!' });
+    }
+
+    if (!tipo || !['aluno', 'professor'].includes(tipo)) {
+      return res.status(400).json({ message: 'Tipo deve ser "aluno" ou "professor"!' });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    if (!lastName || lastName == '') {
-        return res.status(400).json({ message: 'Sobrenome é obrigatório!' });
-    }
-
-    const user = await User.create({ name: name, email: email, lastName, password: hashedPassword });
-    return res.status(200).send(user);
+    const user = await User.create({ name, email, password: hashedPassword, tipo });
+    const { password: _, ...userWithoutPassword } = (user as any).toJSON();
+    return res.status(201).json(userWithoutPassword);
   }
 
   static async remove(req: Request, res: Response) {
     const { id } = req.params;
     const user = await User.findByPk(Number(id));
     if (user) {
-      user?.destroy();
+      await user.destroy();
+      return res.status(204).send();
     } else {
-      res.status(404).json({ messsage: "Usuário não encontrado" });
+      return res.status(404).json({ message: "Usuário não encontrado" });
     }
-
-    res.status(204).send();
   }
 
   static async update(req: Request, res: Response) {
     const { id } = req.params;
-    const { name, email, lastName, password } = req.body;
+    const { name, email, tipo } = req.body;
 
     const user = await User.findByPk(Number(id));
     if (user) {
-      await user.update({
-        name: name,
-        email: email,
-        lastName,
-        password
-      });
-
-      res.status(200).send(user);
+      await user.update({ name, email, tipo });
+      const { password: _, ...userWithoutPassword } = (user as any).toJSON();
+      return res.status(200).json(userWithoutPassword);
     } else {
-      res.status(404).json({ messsage: "Usuário não encontrado" });
+      return res.status(404).json({ message: "Usuário não encontrado" });
     }
   }
 }

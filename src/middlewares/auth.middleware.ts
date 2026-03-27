@@ -4,7 +4,8 @@ import User from "../models/User";
 
 type TokenPayload = {
     id: number,
-    lastName: string
+    name: string,
+    tipo: string,
 }
 
 async function authMiddleware(req: Request, res: Response, next: NextFunction) {
@@ -28,12 +29,11 @@ async function authMiddleware(req: Request, res: Response, next: NextFunction) {
 
         const user = await User.findByPk(decoded.id);
         if (user) {
+            (req as any).user = decoded;
             return next();
         } else {
             return res.status(404).json({ message: 'Usuário não encontrado!' });
         }
-
-        console.log('decoded > ', decoded);
     } catch (err) {
         return res.status(403).json({ message: "Token inválido" });
     }

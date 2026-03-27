@@ -1,10 +1,13 @@
 import app from "./app";
 import sequelize from "./config/database";
+import "./models/User";
+import "./models/Aula";
+import "./models/Agendamento";
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-sequelize.sync({alter: true});
+sequelize.sync({ alter: true });
 
 app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}`);
+  console.log(`Servidor EduLivre rodando na porta ${port}`);
 });

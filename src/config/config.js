@@ -1,9 +1,9 @@
 module.exports = {
   development: {
-    username: 'root',
-    password: 'mysecretpassword',
-    database: 'filmes_2026',
-    host: 'localhost',
-    dialect: 'postgres', // ou mysql
+    username: process.env.DB_USER || 'root',
+    password: process.env.DB_PASS || 'mysecretpassword',
+    database: process.env.DB_NAME || 'edulivre',
+    host: process.env.DB_HOST || 'localhost',
+    dialect: 'mysql',
   },
 };
